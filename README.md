@@ -1,2 +1,3 @@
-# Regimescope
-Diagnostic toolkit for detecting, explaining, and reporting regime shifts in noisy time-series data.
+# ShiftLens
+
+Diagnostic toolkit for detecting, explaining, and reporting behavioural shifts in noisy time-series data.
