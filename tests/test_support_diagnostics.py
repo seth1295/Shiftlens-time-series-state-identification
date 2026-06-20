@@ -15,7 +15,7 @@ def test_support_diagnostics_counts_and_ratios() -> None:
 
 @pytest.mark.parametrize("value", [float("nan"), float("inf"), float("-inf"), -0.1, 1.5])
 def test_support_ratio_validation_rejects_invalid_values(value: float) -> None:
-    with pytest.raises(ValueError, match="finite number between 0.0 and 1.0"):
+    with pytest.raises(ValueError, match=r"finite number between 0\.0 and 1\.0"):
         validate_support_ratio(value)
 
 
@@ -26,5 +26,5 @@ def test_support_ratio_validation_accepts_boundaries(value: float) -> None:
 
 @pytest.mark.parametrize("value", [float("nan"), float("inf"), float("-inf"), -0.1, 1.5])
 def test_support_diagnostics_reject_invalid_min_support_ratio(value: float) -> None:
-    with pytest.raises(ValueError, match="finite number between 0.0 and 1.0"):
+    with pytest.raises(ValueError, match=r"finite number between 0\.0 and 1\.0"):
         compute_state_support_diagnostics(np.array([0, 1]), value)

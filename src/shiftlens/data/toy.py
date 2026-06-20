@@ -4,7 +4,17 @@ import numpy as np
 
 
 def make_toy_state_shift(seed: int = 7) -> dict:
-    """Create deterministic synthetic segments with known labels."""
+    """Create deterministic synthetic segments with known labels.
+
+    Returns a dictionary with:
+    - name: dataset identifier string.
+    - description: summary string.
+    - seed: RNG seed integer.
+    - values: 1D NumPy array of synthetic time-series values.
+    - known_state_labels: 1D NumPy object array of labels.
+    - segment_boundaries: list of dictionaries describing segments.
+    - public_data_notice: toy/synthetic data notice string.
+    """
     rng = np.random.default_rng(seed)
     segments = [
         {"label": "low_mean_low_noise", "length": 60, "mean": 0.0, "std": 0.25},

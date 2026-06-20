@@ -19,6 +19,8 @@ class SimpleStateExtractor:
                 "SimpleStateExtractor requires at least two feature columns for its v0 "
                 "median-split demo: a primary feature and a variability feature."
             )
+        if len(window_indexes) != matrix.shape[0]:
+            raise ValueError("window_indexes length must match number of feature rows")
 
         mean_feature = matrix[:, 0]
         std_feature = matrix[:, 1]

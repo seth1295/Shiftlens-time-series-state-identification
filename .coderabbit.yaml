@@ -1,0 +1,92 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+language: "en-US"
+early_access: false
+
+reviews:
+  profile: "assertive"
+  request_changes_workflow: false
+  high_level_summary: true
+  review_status: true
+  review_details: true
+  poem: false
+  collapse_walkthrough: true
+  changed_files_summary: true
+  sequence_diagrams: false
+  estimate_code_review_effort: true
+  enable_prompt_for_ai_agents: true
+
+  auto_review:
+    enabled: true
+    drafts: false
+    auto_incremental_review: true
+
+  pre_merge_checks:
+    title:
+      mode: "warning"
+      requirements: >-
+        Use a concise, professional title that accurately describes the change.
+        Avoid hype language, private/internal project labels, unrelated version
+        chains, or implementation-detail titles.
+
+    description:
+      mode: "warning"
+
+    issue_assessment:
+      mode: "warning"
+
+    custom_checks:
+      - name: "Public Surface Boundary"
+        mode: "warning"
+        instructions: >-
+          Pass/fail criteria: Fail if public-facing files such as README.md,
+          NOTICE, ATTRIBUTION.md, docs/*.md, examples/*.md, pyproject.toml, CLI
+          help, or package docstrings describe ShiftLens as derived from,
+          sanitized from, exported from, or tied to an unrelated private or
+          proprietary project, private repository, internal audit, private report
+          set, internal artifact chain, internal codename, or unpublished private
+          implementation. Passing PRs use standalone OSS wording and describe only
+          this public ShiftLens project.
+
+      - name: "Diagnostics Only Framing"
+        mode: "warning"
+        instructions: >-
+          Pass/fail criteria: Fail if docs, examples, CLI help, or public APIs
+          frame ShiftLens as an automated decision, execution, operational-control,
+          broker, trading, signal-authority, or production-control system.
+          Passing PRs frame ShiftLens as diagnostics and reproducible state
+          evidence only.
+
+      - name: "Attribution Discipline"
+        mode: "warning"
+        instructions: >-
+          Pass/fail criteria: Fail if the PR adds copied, adapted, or
+          substantially derived third-party source material without preserving
+          applicable license notices and documenting attribution in NOTICE or
+          ATTRIBUTION.md. Passing PRs either contain original project code plus
+          declared package dependencies, or clearly document third-party source
+          provenance.
+
+      - name: "Generated Artifacts"
+        mode: "warning"
+        instructions: >-
+          Pass/fail criteria: Fail if the PR commits generated demo outputs, build
+          artifacts, caches, virtual environments, test caches, or temporary reports
+          unless the PR description explicitly says the generated artifact is
+          intentional and explains why it belongs in source control.
+
+  tools:
+    github-checks:
+      enabled: true
+      timeout_ms: 90000
+    ruff:
+      enabled: true
+    markdownlint:
+      enabled: true
+    yamllint:
+      enabled: true
+    gitleaks:
+      enabled: true
+    trufflehog:
+      enabled: true
+    trivy:
+      enabled: true

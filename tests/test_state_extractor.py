@@ -1,4 +1,5 @@
 import numpy as np
+import pytest
 
 from shiftlens.states.extractor import SimpleStateExtractor
 
@@ -55,6 +56,21 @@ def test_state_extractor_rejects_one_column_feature_matrix() -> None:
         )
     else:
         raise AssertionError("Expected a ValueError for a one-column feature matrix.")
+
+
+def test_state_extractor_rejects_mismatched_window_indexes() -> None:
+    features = np.array(
+        [
+            [0.0, 0.1],
+            [1.0, 0.2],
+            [2.0, 0.3],
+        ],
+        dtype=float,
+    )
+    indexes = np.array([0, 1])
+
+    with pytest.raises(ValueError, match="window_indexes length must match number of feature rows"):
+        SimpleStateExtractor().extract(features, indexes)
 
 
 def test_state_extractor_labels_use_relative_median_wording() -> None:
