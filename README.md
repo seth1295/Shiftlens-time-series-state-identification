@@ -14,7 +14,7 @@ ShiftLens produces diagnostics and reproducible state evidence only. It does not
 
 ## Project Status
 
-ShiftLens is an early public release.
+ShiftLens is an early release.
 
 The current version is intended for experimentation, examples, and reproducible diagnostics on toy or synthetic time-series datasets. APIs, report schemas, and state-diagnostic behavior may change as the project matures.
 

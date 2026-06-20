@@ -13,7 +13,7 @@ def make_toy_state_shift(seed: int = 7) -> dict:
     - values: 1D NumPy array of synthetic time-series values.
     - known_state_labels: 1D NumPy object array of labels.
     - segment_boundaries: list of dictionaries describing segments.
-    - public_data_notice: toy/synthetic data notice string.
+    - dataset_notice: toy/synthetic data notice string.
     """
     rng = np.random.default_rng(seed)
     segments = [
@@ -50,5 +50,5 @@ def make_toy_state_shift(seed: int = 7) -> dict:
         "values": series,
         "known_state_labels": np.asarray(known_labels, dtype=object),
         "segment_boundaries": boundaries,
-        "public_data_notice": "Public toy/synthetic data only. No private material used.",
+        "dataset_notice": "Toy/synthetic datasets were used.",
     }

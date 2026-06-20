@@ -12,7 +12,7 @@ def test_report_writer_creates_json_and_markdown(tmp_path) -> None:
             "seed": 7,
             "values": [1.0, 2.0, 3.0],
             "known_state_labels": __import__("numpy").array(["a", "b", "c"], dtype=object),
-            "public_data_notice": "Public toy/synthetic data only. No private material used.",
+            "dataset_notice": "Toy/synthetic datasets were used.",
         },
         feature_batch={
             "provider_name": "basic_rolling_window",
