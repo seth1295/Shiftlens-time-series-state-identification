@@ -956,9 +956,80 @@ Valid split proposals must satisfy child support requirements and the mass-weigh
 
 An overloaded state has thresholded evidence that the candidate contains multiple supported sub-states. It is not automatically validated statehood; it is a split-repair candidate.
 
-\(\Delta V_{split}\) is the mass-weighted split improvement defined in §22.1.
+\(\Delta V_{split}\) is the mass-weighted split improvement defined in §22.2.
 
-### 22.1 Mass-weighted split improvement
+### 22.1 Complexity penalty parameters
+
+Split, merge, and repair tests use explicit complexity penalties so structural changes must earn more evidence than they cost.
+
+Penalty weights are non-negative:
+
+\[
+\lambda_{split} \geq 0
+\]
+
+\[
+\lambda_{merge} \geq 0
+\]
+
+\[
+\lambda_{\rho} \geq 0
+\]
+
+These are critic or report policy parameters, not universal constants. They scale the cost of adding structural complexity. They may be configured, estimated from validation policy, or declared in the report configuration. Higher values make the critic more conservative about split and repair actions. A zero value means no explicit complexity penalty; this is allowed only in exploratory mode and should be reported.
+
+Define a non-negative complexity functional for a proposed structural or repair operation \(\rho\):
+
+\[
+\operatorname{Complexity}(\rho) \geq 0
+\]
+
+A generic form is:
+
+\[
+\operatorname{Complexity}(\rho)
+=
+\gamma_S \Delta K_{\rho}
++
+\gamma_T \Delta T_{\rho}
++
+\gamma_{\Theta} \Delta P_{\rho}
+\]
+
+where:
+
+- \(\Delta K_{\rho}\) is the number of additional candidate states introduced by the operation.
+- \(\Delta T_{\rho}\) is the number of additional transition or boundary relations introduced or made explicit.
+- \(\Delta P_{\rho}\) is the number of additional lens, window, threshold, or critic parameters introduced by the operation.
+- \(\gamma_S,\gamma_T,\gamma_{\Theta} \geq 0\) are policy weights.
+
+For split:
+
+\[
+\operatorname{Complexity}(k \rightarrow k1,k2)
+\]
+
+measures the added structural cost of replacing one candidate with two child candidates, including added state count, boundary relations, and any additional parameters required to justify the split.
+
+For merge:
+
+\[
+\operatorname{Complexity}(i,j \rightarrow ij)
+\]
+
+measures the structural and reporting cost of replacing two candidates with one merged candidate. This may be lower than split complexity but should still be explicit because the merge changes the state inventory and transition structure.
+
+For generic repair:
+
+\[
+\operatorname{Complexity}(\rho)
+\]
+
+measures the operation-specific structural cost of the proposed repair action.
+
+Split and merge tests use operation-specific penalty weights \(\lambda_{split}\) and \(\lambda_{merge}\). The repair operator in Section 25 uses the generic \(\lambda_{\rho}\operatorname{Complexity}(\rho)\) form. All penalty weights and complexity components should be reported or configured for reproducibility in validation mode.
+
+### 22.2 Mass-weighted split improvement
 
 Split improvement should be mass-weighted and should pay a subtractive complexity penalty:
 
@@ -1102,8 +1173,10 @@ where:
 To avoid overfitting, add a subtractive complexity penalty:
 
 \[
-\rho^* = \arg\max_{\rho} [\Delta V(\rho(S_k)) - \lambda \cdot \text{Complexity}(\rho)]
+\rho^* = \arg\max_{\rho} [\Delta V(\rho(S_k)) - \lambda_{\rho}\operatorname{Complexity}(\rho)]
 \]
+
+\(\lambda_{\rho}\) is the operation-specific repair penalty defined in the complexity penalty section.
 
 This prevents the system from endlessly splitting states until every point becomes its own state.
 
