@@ -819,19 +819,44 @@ Level 1 does not require null-model significance. Level 2 adds corrected signifi
 \mathbf{1}[q_k < \alpha]
 \]
 
+### Transfer protocol predicates
+
+Directed all-pairs transfer is the default formal Level 3+ protocol:
+
+\[
+\operatorname{DirectedAllPairsPass}(S_k)
+=
+\left[
+R_k^{directed} \geq R_{min}
+\land
+A_k^{transfer} \leq A_{max}
+\right]
+\]
+
+An equivalent bidirectional audit may satisfy the gate only when explicitly declared and justified in the report protocol:
+
+\[
+\operatorname{EquivalentBidirectionalAuditPass}(S_k)
+\]
+
 Define the Level 3 transfer gate:
 
 \[
 \mathcal{G}_{transfer}(S_k)
 =
-\mathbf{1}[
-R_k^{directed} \geq R_{min}
+\mathbf{1}
+\left[
+\operatorname{AttemptedTransferProtocol}(S_k)
 \land
-A_k^{transfer} \leq A_{max}
-]
+\left(
+\operatorname{DirectedAllPairsPass}(S_k)
+\lor
+\operatorname{EquivalentBidirectionalAuditPass}(S_k)
+\right)
+\right]
 \]
 
-Canonical-reference transfer is acceptable for exploratory reports and Level 0-2 claims when declared. Canonical-reference transfer alone is not sufficient for a general Level 3+ transferable-state claim. Level 3+ claims require directed all-pairs transfer or an explicitly justified equivalent bidirectional audit protocol.
+Canonical-reference transfer is acceptable for exploratory reports and Level 0-2 claims when declared. Canonical-reference transfer alone is not sufficient for a general Level 3+ transferable-state claim unless the claim is explicitly limited to canonical-reference transfer. Level 3+ claims require an attempted transfer protocol: directed all-pairs transfer or an explicitly justified equivalent bidirectional audit protocol.
 
 Define the claim-level statehood function:
 
@@ -869,11 +894,11 @@ where \(\mathcal{F}(S_k)\) is the state-family criterion based on structural-sig
 
 Interpretation:
 
-- Level 0 is a candidate evidence region or exploratory candidate. It makes no validation claim.
-- Level 1 is a local state object with support, coherence, separation, persistence, and no hard rejection.
-- Level 2 is a statistically validated local or temporal state with corrected significance and no hard rejection.
-- Level 3 is a transferable state requiring directed transfer evidence or an explicitly declared equivalent bidirectional audit.
-- Level 4 is a state family requiring Level 3 transfer discipline plus structural-signature similarity and family-level criteria.
+- At level 0, the object is a candidate evidence region or exploratory candidate. It makes no validation claim.
+- At level 1, the object is a local state object with support, coherence, separation, persistence, and no hard rejection.
+- At level 2, the object is a statistically validated local or temporal state with corrected significance and no hard rejection.
+- At level 3, the object is a transferable state requiring directed transfer evidence or an explicitly declared equivalent bidirectional audit.
+- At level 4, the object is a state family requiring Level 3 transfer discipline plus structural-signature similarity and family-level criteria.
 
 Hard rejection remains separate and applies wherever validation is claimed. Missing transfer evidence limits the claim level; it does not automatically reject a local state.
 
@@ -1191,13 +1216,27 @@ C_k \geq C_{min}
 P_k \geq P_{min}
 \]
 
-but transfer fails:
+and a declared transfer protocol was attempted:
 
 \[
-R_k^{protocol} < R_{min}
+\operatorname{AttemptedTransferProtocol}(S_k)
 \]
 
-or transfer fails in a structured way.
+Define protocol-scoped transfer failure:
+
+\[
+\operatorname{TransferFailed}_{protocol}(S_k)
+=
+\left[
+R_k^{protocol} < R_{min}
+\right]
+\]
+
+where \(R_k^{protocol}\) is defined only under the attempted transfer protocol.
+
+A failed transfer means a declared transfer protocol was run and did not meet its threshold. Missing transfer evidence means no transfer protocol was run; it should limit the maximum claim level, not trigger \(\text{UnknownCandidate}\) by itself.
+
+The attempted transfer may also fail in a structured way.
 
 Structured failure means the failure pattern is not random under null:
 
@@ -1208,8 +1247,23 @@ p(\text{transfer failure pattern}) < \alpha
 So:
 
 \[
-\text{UnknownCandidate}(S_k) = [\text{local evidence strong} \land \text{transfer failure significant} \land \text{source fingerprint not sufficient explanation}]
+\text{UnknownCandidate}(S_k) =
+[
+\text{local evidence strong}
+\land
+\operatorname{AttemptedTransferProtocol}(S_k)
+\land
+\left(
+\operatorname{TransferFailed}_{protocol}(S_k)
+\lor
+p(\text{transfer failure pattern}) < \alpha
+\right)
+\land
+\text{source fingerprint not sufficient explanation}
+]
 \]
+
+\(\text{UnknownCandidate}\) should fire only when local evidence is strong and an attempted transfer fails without being explained by source fingerprinting or another rejection reason.
 
 Plain interpretation:
 
