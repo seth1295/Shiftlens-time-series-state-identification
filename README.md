@@ -10,7 +10,7 @@ The first release focuses on:
 - support diagnostics and explicit rejection records
 - reproducible JSON and Markdown reporting
 
-ShiftLens produces diagnostics and reproducible state evidence only. It does not provide decision, execution, operational, or control authority.
+ShiftLens produces diagnostics and reproducible state evidence only. It does not make recommendations, take actions, approve outcomes, or operate systems.
 
 ## Project Status
 
@@ -18,7 +18,7 @@ ShiftLens is an early release.
 
 The current version is intended for experimentation, examples, and reproducible diagnostics on toy or synthetic time-series datasets. APIs, report schemas, and state-diagnostic behavior may change as the project matures.
 
-ShiftLens is not production-ready and should not be used as an automated decision, execution, or operational control system.
+ShiftLens is not production-ready and should not be used to make recommendations, take actions, approve outcomes, or operate systems.
 
 
 ## Install
@@ -46,8 +46,8 @@ This release contains original ShiftLens source code, documentation, examples, a
 
 Runtime and test dependencies are declared in `pyproject.toml`.
 
-Any future copied, adapted, or substantially derived third-party source material will preserve applicable license notices and attribution and will be documented in `NOTICE` or `ATTRIBUTION.md` as appropriate.
+Any future third-party code or content requiring attribution will preserve applicable license notices and attribution and will be documented in `NOTICE` or `ATTRIBUTION.md` as appropriate.
 
 ## Scope
 
-ShiftLens produces diagnostics and reproducible state evidence only. ShiftLens does not provide decision, execution, operational, or control authority.
+ShiftLens produces diagnostics and reproducible state evidence only. ShiftLens does not make recommendations, take actions, approve outcomes, or operate systems.
