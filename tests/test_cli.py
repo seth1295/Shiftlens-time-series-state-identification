@@ -7,7 +7,7 @@ from shiftlens.cli import TOY_STATE_SHIFT_NUM_POINTS, build_parser, valid_ratio,
 
 @pytest.mark.parametrize("value", ["nan", "inf", "-inf", "-0.1", "1.5"])
 def test_valid_ratio_rejects_invalid_values(value: str) -> None:
-    with pytest.raises(argparse.ArgumentTypeError, match="finite number between 0.0 and 1.0"):
+    with pytest.raises(argparse.ArgumentTypeError, match=r"finite number between 0\.0 and 1\.0"):
         valid_ratio(value)
 
 
