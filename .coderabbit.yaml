@@ -25,8 +25,8 @@ reviews:
       mode: "warning"
       requirements: >-
         Use a concise, professional title that accurately describes the change.
-        Avoid hype language, private/internal project labels, unrelated version
-        chains, or implementation-detail titles.
+        Avoid hype language, unrelated project labels, external lineage claims,
+        or implementation-detail titles.
 
     description:
       mode: "warning"
@@ -36,25 +36,23 @@ reviews:
 
     custom_checks:
       - name: "Public Surface Boundary"
-        mode: "warning"
+        mode: "error"
         instructions: >-
           Pass/fail criteria: Fail if public-facing files such as README.md,
           NOTICE, ATTRIBUTION.md, docs/*.md, examples/*.md, pyproject.toml, CLI
           help, or package docstrings describe ShiftLens as derived from,
-          sanitized from, exported from, or tied to an unrelated private or
-          proprietary project, private repository, internal audit, private report
-          set, internal artifact chain, internal codename, or unpublished private
-          implementation. Passing PRs use standalone OSS wording and describe only
-          this public ShiftLens project.
+          sanitized from, exported from, or tied to any unrelated project,
+          external repository, review archive, report set, codename, unpublished
+          implementation detail, or external provenance story. Passing PRs use
+          standalone OSS wording and describe only this ShiftLens project.
 
       - name: "Diagnostics Only Framing"
-        mode: "warning"
+        mode: "error"
         instructions: >-
           Pass/fail criteria: Fail if docs, examples, CLI help, or public APIs
-          frame ShiftLens as an automated decision, execution, operational-control,
-          broker, trading, signal-authority, or production-control system.
-          Passing PRs frame ShiftLens as diagnostics and reproducible state
-          evidence only.
+          frame ShiftLens as an automated decision, execution, operational,
+          signal-authority, or production-control system. Passing PRs frame
+          ShiftLens as diagnostics and reproducible state evidence only.
 
       - name: "Attribution Discipline"
         mode: "warning"
