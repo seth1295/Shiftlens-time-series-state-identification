@@ -40,8 +40,8 @@ reviews:
         instructions: >-
           Pass/fail criteria: Fail if user-facing files such as README.md,
           NOTICE, ATTRIBUTION.md, docs/*.md, examples/*.md, pyproject.toml, CLI
-          help, or package docstrings describe ShiftLens as copied from, derived
-          from, or tied to unrelated provenance outside this repository. Passing
+          help, or package docstrings present ShiftLens as originating outside
+          this repository's documented project scope. Passing
           PRs use standalone OSS wording and describe only ShiftLens, its
           repository scope, its declared dependencies, and its documented
           attribution policy.
