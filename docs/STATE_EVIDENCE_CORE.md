@@ -867,6 +867,28 @@ Where:
 - \(P_{dirty}\) is the minimum persistence evidence for dirty-state suspicion.
 - \(B_{dirty}\) and \(P_{dirty}\) are weaker repair-diagnostic thresholds, not full validation thresholds.
 
+Threshold constraints:
+
+\[
+0 \leq B_{dirty} < B_{min}
+\]
+
+\[
+0 \leq P_{dirty} < P_{min}
+\]
+
+A simple default rule is:
+
+\[
+B_{dirty} = \alpha_B B_{min}, \quad 0 < \alpha_B < 1
+\]
+
+\[
+P_{dirty} = \alpha_P P_{min}, \quad 0 < \alpha_P < 1
+\]
+
+where \(\alpha_B\) and \(\alpha_P\) are lens-level repair sensitivity parameters. Lower values make dirty-state suspicion more permissive; higher values make it closer to validation strictness.
+
 A dirty state is not validated statehood. It is a repair candidate: enough structure exists to justify repair, but the candidate fails coherence.
 
 An overloaded state can be defined as:
@@ -890,6 +912,26 @@ Where:
 - \(\sigma^2_{over}\) is the dispersion threshold for overloaded-state suspicion.
 - \(\delta_{split}\) is the minimum required mass-weighted improvement from a split after the complexity penalty.
 - \(S_{k1}\) and \(S_{k2}\) are proposed child candidates of \(S_k\).
+
+\[
+\sigma^2_{over} = q_{over}\left(\{\sigma_j^2 : s_j \geq s_{min}\}\right)
+\]
+
+where \(q_{over}\) is a high quantile selected by the lens, such as the 0.75 or 0.90 quantile. This makes overloaded-state suspicion relative to the dispersion profile of supported candidates under the same lens.
+
+\[
+\delta_{split} > 0
+\]
+
+A practical default is:
+
+\[
+\delta_{split} = \max(\epsilon_V, \eta_{split} n_k V_k)
+\]
+
+where \(\epsilon_V > 0\) is the smallest meaningful evidence-improvement margin and \(\eta_{split} > 0\) is the minimum proportional gain required before accepting a split proposal.
+
+Valid split proposals must satisfy child support requirements and the mass-weighted improvement requirement. A split that improves only one local score but fails \(\Delta V_{split} \geq \delta_{split}\) is not enough to mark a candidate overloaded.
 
 An overloaded state has thresholded evidence that the candidate contains multiple supported sub-states. It is not automatically validated statehood; it is a split-repair candidate.
 
