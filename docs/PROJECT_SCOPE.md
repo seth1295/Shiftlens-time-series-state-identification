@@ -1,4 +1,4 @@
-# Public Boundary
+# Project Scope
 
 ShiftLens is a diagnostics and reproducible state-evidence toolkit for noisy time-series data.
 
