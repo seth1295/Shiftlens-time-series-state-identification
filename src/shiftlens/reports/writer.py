@@ -26,7 +26,7 @@ def _render_markdown_report(report: dict) -> str:
     lines = [
         "# ShiftLens Toy State Report",
         "",
-        "Toy/synthetic datasets were used for this report.",
+        str(dataset_summary["dataset_notice"]),
         "",
         "## Artifact Identity",
         f"- Project: {artifact_identity['project']}",

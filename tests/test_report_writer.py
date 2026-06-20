@@ -35,5 +35,7 @@ def test_report_writer_creates_json_and_markdown(tmp_path) -> None:
     )
     json_path, md_path = write_report_bundle(tmp_path, report)
     loaded = json.loads(json_path.read_text(encoding="utf-8"))
+    markdown = md_path.read_text(encoding="utf-8")
     assert loaded["artifact_identity"]["project"] == "ShiftLens"
-    assert md_path.read_text(encoding="utf-8").startswith("# ShiftLens Toy State Report")
+    assert markdown.startswith("# ShiftLens Toy State Report")
+    assert "Toy/synthetic datasets were used." in markdown
