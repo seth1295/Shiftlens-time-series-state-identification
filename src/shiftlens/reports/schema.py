@@ -42,8 +42,8 @@ def build_report_payload(
         "states": extraction["state_summaries"],
         "diagnostics": diagnostics,
         "rejection_records": rejection_records,
-        "provenance": {
+        "source_trace": {
             "implementation_origin": "Original ShiftLens source code.",
-            "source_material_notice": "Toy/synthetic datasets were used for this report.",
+            "dataset_notice": "Toy/synthetic datasets were used for this report.",
         },
     }

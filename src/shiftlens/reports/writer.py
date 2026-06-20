@@ -78,9 +78,9 @@ def _render_markdown_report(report: dict) -> str:
     lines.extend(
         [
             "",
-            "## Provenance",
-            f"- {report['provenance']['implementation_origin']}",
-            f"- {report['provenance']['source_material_notice']}",
+            "## Source Trace",
+            f"- {report['source_trace']['implementation_origin']}",
+            f"- {report['source_trace']['dataset_notice']}",
             "",
         ]
     )

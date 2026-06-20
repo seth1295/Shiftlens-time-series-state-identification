@@ -7,4 +7,4 @@ The north star for ShiftLens is practical state visibility:
 - reject weak states explicitly
 - make outputs reproducible and testable
 
-The first release keeps the implementation minimal and deterministic. It uses toy/synthetic data and focuses on diagnostics and reporting rather than authority or action.
+The first release keeps the implementation minimal and deterministic. It uses toy/synthetic data and focuses on diagnostics and reporting rather than recommendations or actions.

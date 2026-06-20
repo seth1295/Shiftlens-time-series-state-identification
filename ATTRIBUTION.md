@@ -8,8 +8,8 @@ This release contains original ShiftLens source code, documentation, examples, a
 
 Runtime and test dependencies are declared in `pyproject.toml`.
 
-## Third-party source material
+## Third-party material
 
-This release does not intentionally include copied, adapted, or substantially derived third-party source material beyond declared package dependencies.
+This release does not intentionally include third-party code or content requiring attribution beyond declared package dependencies.
 
-Any future copied, adapted, or substantially derived third-party source material must preserve applicable license headers, notices, and attribution, and must be documented in this file or in `NOTICE` as appropriate.
+Any future third-party code or content requiring attribution must preserve applicable license headers, notices, and attribution, and must be documented in this file or in `NOTICE` as appropriate.
