@@ -690,7 +690,7 @@ not raw p-values alone.
 For each candidate state:
 
 \[
-\mathbf{e}_k = [s_k, C_k, B_k, Q_k, P_k, A_k, R_k, 1-\Pi_k^{source}]
+\mathbf{e}_k = [s_k, C_k, B_k, Q_k, P_k, A_k, R_k^{protocol}, 1-\Pi_k^{source}]
 \]
 
 Where:
@@ -703,8 +703,18 @@ Where:
 | \(Q_k\) | boundary confidence |
 | \(P_k\) | temporal persistence |
 | \(A_k\) | stability over time |
-| \(R_k\) | transfer/reproducibility |
+| \(R_k^{protocol}\) | transfer or reproducibility evidence under the declared protocol |
 | \(1-\Pi_k^{source}\) | resistance to source fingerprinting |
+
+The transfer term is protocol-dependent. Examples include:
+
+- \(R_{ref \rightarrow b}^{(k)}\) for canonical-reference transfer from a declared reference source to target source \(b\).
+- \(R_k^{directed}\) for directed all-pairs transfer summaries.
+- an omitted transfer term when no transfer protocol is run.
+
+This differs from \(R_k \subseteq \mathcal{E}\), which denotes the candidate evidence region.
+
+Missing transfer evidence is a claim-level limitation, not a fake zero score. If transfer is not run, the transfer term is omitted from scalar reporting and utility aggregation rather than clipped to \(\epsilon\). A local state can be Level 1 or Level 2 without transfer evidence. A Level 3+ claim cannot be made without the relevant transfer protocol.
 
 A state has an evidence profile, not just a grade.
 
@@ -726,10 +736,10 @@ where:
 0 < \epsilon \ll 1
 \]
 
-Then define visibility:
+Let \(\mathcal{L}_{k}^{report}\) be the set of available evidence terms for the declared claim and report protocol. Then define visibility:
 
 \[
-V_k = \prod_l \tilde{e}_{kl}^{w_l}
+V_k = \prod_{l \in \mathcal{L}_{k}^{report}} \tilde{e}_{kl}^{w_l}
 \]
 
 where all weights are non-negative:
@@ -741,17 +751,19 @@ w_l \geq 0
 For numerical stability, use log form:
 
 \[
-\log V_k = \sum_l w_l \log \tilde{e}_{kl}
+\log V_k = \sum_{l \in \mathcal{L}_{k}^{report}} w_l \log \tilde{e}_{kl}
 \]
 
 The clipped scalar visibility score is for reporting, ranking, and presentation. It should not be used as the optimization objective for split, merge, or repair decisions. Hard gates remain separate.
 
 A state should not be validated merely because its scalar visibility score is high, and a state should not be silently destroyed by one near-zero numerical term unless that term also fails an explicit hard gate.
 
+Visibility aggregates only evidence terms available under the declared claim and report protocol. Missing transfer evidence should be represented as a claim-level limitation, not as a near-zero clipped term. Transfer failure under an attempted Level 3+ protocol can fail the Level 3 transfer gate, but absence of a transfer protocol should not destroy a Level 1 or Level 2 local state score.
+
 Define an uncapped evidence utility for comparing repair proposals:
 
 \[
-U_k = \sum_l w_l \log(e_{kl} + \epsilon_U)
+U_k = \sum_{l \in \mathcal{L}_{k}^{report}} w_l \log(e_{kl} + \epsilon_U)
 \]
 
 where:
@@ -762,7 +774,7 @@ where:
 
 and \(e_{kl}\) are the unclipped evidence terms from the evidence profile. \(U_k\) does not use the clipped \(\tilde{e}_{kl}\) terms that define \(V_k\).
 
-The utility \(U_k\) is used only to compare candidate repairs among already-eligible repair proposals. It does not validate statehood by itself. Hard gates remain separate from both \(V_k\) and \(U_k\).
+The utility \(U_k\) also aggregates only available evidence terms for the declared claim and report protocol. It is used only to compare candidate repairs among already-eligible repair proposals. It does not validate statehood by itself. Hard gates remain separate from both \(V_k\) and \(U_k\).
 
 Plain interpretation:
 
@@ -775,49 +787,120 @@ persistent, stable, transferable, and resistant to trivial source explanations.
 
 ## 20. Statehood test
 
-A candidate becomes a validated state object only if:
+A claim-level statehood test should declare what level of statehood is being claimed.
 
 \[
+L \in \{0,1,2,3,4\}
+\]
+
+Define a reusable base gate for local state evidence:
+
+\[
+\mathcal{B}(S_k)
+=
+\mathbf{1}[
 s_k \geq s_{min}
-\]
-
-\[
+\land
 C_k \geq C_{min}
-\]
-
-\[
+\land
 B_k \geq B_{min}
-\]
-
-\[
+\land
 P_k \geq P_{min}
+\land
+\neg \operatorname{HardReject}(S_k)
+]
+\]
+
+Level 1 does not require null-model significance. Level 2 adds corrected significance:
+
+\[
+\mathcal{Q}(S_k)
+=
+\mathbf{1}[q_k < \alpha]
+\]
+
+### Transfer protocol predicates
+
+Directed all-pairs transfer is the default formal Level 3+ protocol:
+
+\[
+\operatorname{DirectedAllPairsPass}(S_k)
+=
+\left[
+R_k^{directed} \geq R_{min}
+\land
+A_k^{transfer} \leq A_{max}
+\right]
+\]
+
+An equivalent bidirectional audit may satisfy the gate only when explicitly declared and justified in the report protocol:
+
+\[
+\operatorname{EquivalentBidirectionalAuditPass}(S_k)
+\]
+
+Define the Level 3 transfer gate:
+
+\[
+\mathcal{G}_{transfer}(S_k)
+=
+\mathbf{1}
+\left[
+\operatorname{AttemptedTransferProtocol}(S_k)
+\land
+\left(
+\operatorname{DirectedAllPairsPass}(S_k)
+\lor
+\operatorname{EquivalentBidirectionalAuditPass}(S_k)
+\right)
+\right]
+\]
+
+Canonical-reference transfer is acceptable for exploratory reports and Level 0-2 claims when declared. Canonical-reference transfer alone is not sufficient for a general Level 3+ transferable-state claim unless the claim is explicitly limited to canonical-reference transfer. Level 3+ claims require an attempted transfer protocol: directed all-pairs transfer or an explicitly justified equivalent bidirectional audit protocol.
+
+Define the claim-level statehood function:
+
+\[
+\mathcal{T}_L(S_k)
+\]
+
+with:
+
+\[
+\mathcal{T}_0(S_k) =
+\mathbf{1}[S_k \text{ is a candidate evidence region}]
 \]
 
 \[
-q_k < \alpha
+\mathcal{T}_1(S_k) = \mathcal{B}(S_k)
 \]
-
-and no hard rejection applies.
-
-Define:
 
 \[
-\mathcal{T}(S_k) = \mathbf{1}[s_k \geq s_{min} \land C_k \geq C_{min} \land B_k \geq B_{min} \land P_k \geq P_{min} \land q_k < \alpha \land \neg \text{HardReject}(S_k)]
+\mathcal{T}_2(S_k) = \mathcal{B}(S_k) \land \mathcal{Q}(S_k)
 \]
-
-Then:
 
 \[
-S_k \in \text{ValidatedStates}
+\mathcal{T}_3(S_k) = \mathcal{B}(S_k) \land \mathcal{Q}(S_k) \land \mathcal{G}_{transfer}(S_k)
 \]
-
-if and only if:
 
 \[
-\mathcal{T}(S_k)=1
+\mathcal{T}_4(S_k) =
+\mathcal{T}_3(S_k)
+\land
+\mathcal{F}(S_k)
 \]
 
-Transfer gates apply according to the level of claim being made. A local or temporal state claim does not require the same transfer evidence as a Level 3+ transferable-state claim.
+where \(\mathcal{F}(S_k)\) is the state-family criterion based on structural-signature similarity and family-level evidence.
+
+Interpretation:
+
+- At level 0, the object is a candidate evidence region or exploratory candidate. It makes no validation claim.
+- At level 1, the object is a local state object with support, coherence, separation, persistence, and no hard rejection.
+- At level 2, the object is a statistically validated local or temporal state with corrected significance and no hard rejection.
+- At level 3, the object is a transferable state requiring directed transfer evidence or an explicitly declared equivalent bidirectional audit.
+- At level 4, the object is a state family requiring Level 3 transfer discipline plus structural-signature similarity and family-level criteria.
+
+Hard rejection remains separate and applies wherever validation is claimed. Missing transfer evidence limits the claim level; it does not automatically reject a local state.
 
 ---
 
@@ -847,7 +930,7 @@ Examples:
 \text{poor\_separation} & B_k < B_{min} \\
 \text{temporal\_flicker} & P_k < P_{min} \\
 \text{source\_fingerprint} & \Pi_k^{source} > \Pi_{max} \\
-\text{non\_reproducible} & R_k < R_{min} \\
+\text{non\_reproducible} & R_k^{protocol} < R_{min} \text{ under an attempted transfer protocol} \\
 \text{unstable\_region} & A_k < A_{min}
 \end{cases}
 \]
@@ -1133,13 +1216,27 @@ C_k \geq C_{min}
 P_k \geq P_{min}
 \]
 
-but transfer fails:
+and a declared transfer protocol was attempted:
 
 \[
-R_k < R_{min}
+\operatorname{AttemptedTransferProtocol}(S_k)
 \]
 
-or transfer fails in a structured way.
+Define protocol-scoped transfer failure:
+
+\[
+\operatorname{TransferFailed}_{protocol}(S_k)
+=
+\left[
+R_k^{protocol} < R_{min}
+\right]
+\]
+
+where \(R_k^{protocol}\) is defined only under the attempted transfer protocol.
+
+A failed transfer means a declared transfer protocol was run and did not meet its threshold. Missing transfer evidence means no transfer protocol was run; it should limit the maximum claim level, not trigger \(\text{UnknownCandidate}\) by itself.
+
+The attempted transfer may also fail in a structured way.
 
 Structured failure means the failure pattern is not random under null:
 
@@ -1150,8 +1247,23 @@ p(\text{transfer failure pattern}) < \alpha
 So:
 
 \[
-\text{UnknownCandidate}(S_k) = [\text{local evidence strong} \land \text{transfer failure significant} \land \text{source fingerprint not sufficient explanation}]
+\text{UnknownCandidate}(S_k) =
+[
+\text{local evidence strong}
+\land
+\operatorname{AttemptedTransferProtocol}(S_k)
+\land
+\left(
+\operatorname{TransferFailed}_{protocol}(S_k)
+\lor
+p(\text{transfer failure pattern}) < \alpha
+\right)
+\land
+\text{source fingerprint not sufficient explanation}
+]
 \]
+
+\(\text{UnknownCandidate}\) should fire only when local evidence is strong and an attempted transfer fails without being explained by source fingerprinting or another rejection reason.
 
 Plain interpretation:
 
@@ -1261,32 +1373,40 @@ A region was found.
 No strong claim yet.
 ```
 
-### Level 1 — Supported state candidate
+### Level 1 — Local state object
 
 \[
 S_k^{1}
 \]
 
-Exists when support, coherence, and separation clear minimum thresholds.
+Exists when:
+
+\[
+\mathcal{T}_1(S_k)=1
+\]
 
 Meaning:
 
 ```text
-The region has evidence.
+The region has local state evidence.
 ```
 
-### Level 2 — Temporal state object
+### Level 2 — Statistically validated local or temporal state
 
 \[
 S_k^{2}
 \]
 
-Exists when persistence and transition tests show temporal structure.
+Exists when:
+
+\[
+\mathcal{T}_2(S_k)=1
+\]
 
 Meaning:
 
 ```text
-The region behaves like a process condition over time.
+The region has corrected statistical evidence under the local or temporal validation protocol.
 ```
 
 Canonical-reference transfer may be reported at this level as exploratory transfer evidence, but it does not establish a general transferable-state claim.
@@ -1298,6 +1418,10 @@ S_k^{3}
 \]
 
 Exists when directed all-pairs transfer or an explicitly justified equivalent bidirectional audit passes the transfer-strength and transfer-asymmetry gates.
+
+\[
+\mathcal{T}_3(S_k)=1
+\]
 
 Meaning:
 
@@ -1321,6 +1445,12 @@ with:
 
 \[
 d_F(S_k^a,S_k^b) < \epsilon_F
+\]
+
+and:
+
+\[
+\mathcal{T}_4(S_k)=1
 \]
 
 Meaning:
@@ -1349,6 +1479,8 @@ z_i = \phi(W_i; \Theta)
 R_k \subseteq \mathcal{E}
 \]
 
+Here \(R_k\) is the candidate evidence region, not the transfer evidence term \(R_k^{protocol}\).
+
 \[
 \mu_k(z_i) \in [0,1]
 \]
@@ -1358,7 +1490,7 @@ S_k = \{(W_i,z_i,\mu_k(z_i))\}_{i=1}^{N}
 \]
 
 \[
-\mathbf{e}_k = [s_k, C_k, B_k, Q_k, P_k, A_k, R_k, 1-\Pi_k^{source}]
+\mathbf{e}_k = [s_k, C_k, B_k, Q_k, P_k, A_k, R_k^{protocol}, 1-\Pi_k^{source}]
 \]
 
 \[
@@ -1366,7 +1498,11 @@ S_k = \{(W_i,z_i,\mu_k(z_i))\}_{i=1}^{N}
 \]
 
 \[
-V_k = \prod_l \tilde{e}_{kl}^{w_l}
+V_k = \prod_{l \in \mathcal{L}_{k}^{report}} \tilde{e}_{kl}^{w_l}
+\]
+
+\[
+U_k = \sum_{l \in \mathcal{L}_{k}^{report}} w_l \log(e_{kl} + \epsilon_U)
 \]
 
 \[
@@ -1374,7 +1510,7 @@ V_k = \prod_l \tilde{e}_{kl}^{w_l}
 \]
 
 \[
-S_k \text{ is validated iff } \mathcal{T}(S_k)=1
+S_k \text{ has claim level } L \text{ iff } \mathcal{T}_L(S_k)=1
 \]
 
 Validation requires claim-appropriate evidence, including:
@@ -1389,7 +1525,7 @@ Validation requires claim-appropriate evidence, including:
 - low source fingerprint;
 - null-model survival;
 - explicit rejection record;
-- transfer evidence when the claim requires transfer.
+- protocol-dependent transfer evidence when the claim requires transfer.
 
 ---
 
