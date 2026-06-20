@@ -43,7 +43,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="shiftlens")
     subparsers = parser.add_subparsers(dest="command", required=True)
 
-    demo_parser = subparsers.add_parser("demo", help="Run a public toy demo.")
+    demo_parser = subparsers.add_parser("demo", help="Run the toy demo.")
     demo_subparsers = demo_parser.add_subparsers(dest="demo_name", required=True)
 
     toy_parser = demo_subparsers.add_parser(

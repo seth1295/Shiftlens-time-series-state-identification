@@ -25,7 +25,7 @@ def build_report_payload(
             "seed": dataset["seed"],
             "num_points": int(len(dataset["values"])),
             "known_state_labels": sorted(set(dataset["known_state_labels"].tolist())),
-            "public_data_notice": dataset["public_data_notice"],
+            "dataset_notice": dataset["dataset_notice"],
         },
         "feature_providers": [
             {
