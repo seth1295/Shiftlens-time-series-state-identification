@@ -744,9 +744,25 @@ For numerical stability, use log form:
 \log V_k = \sum_l w_l \log \tilde{e}_{kl}
 \]
 
-The clipped scalar visibility score is for ranking and reporting. Hard gates remain separate.
+The clipped scalar visibility score is for reporting, ranking, and presentation. It should not be used as the optimization objective for split, merge, or repair decisions. Hard gates remain separate.
 
 A state should not be validated merely because its scalar visibility score is high, and a state should not be silently destroyed by one near-zero numerical term unless that term also fails an explicit hard gate.
+
+Define an uncapped evidence utility for comparing repair proposals:
+
+\[
+U_k = \sum_l w_l \log(e_{kl} + \epsilon_U)
+\]
+
+where:
+
+\[
+\epsilon_U > 0
+\]
+
+and \(e_{kl}\) are the unclipped evidence terms from the evidence profile. \(U_k\) does not use the clipped \(\tilde{e}_{kl}\) terms that define \(V_k\).
+
+The utility \(U_k\) is used only to compare candidate repairs among already-eligible repair proposals. It does not validate statehood by itself. Hard gates remain separate from both \(V_k\) and \(U_k\).
 
 Plain interpretation:
 
@@ -905,7 +921,7 @@ s_{k1} \geq s_{min}
 \land
 s_{k2} \geq s_{min}
 \land
-\Delta V_{split} \geq \delta_{split}
+\Delta U_{split} \geq \delta_{split}
 \right]
 \]
 
@@ -914,7 +930,7 @@ Where:
 - \(\mathcal{D}_{over}\) is the supported-candidate dispersion cohort used to set the overloaded-state threshold.
 - \(n_{over}^{min}\) is the minimum cohort size required before evaluating a cohort-relative overloaded-state threshold.
 - \(\sigma^2_{over}\) is the dispersion threshold for overloaded-state suspicion.
-- \(\delta_{split}\) is the minimum required mass-weighted improvement from a split after the complexity penalty.
+- \(\delta_{split}\) is the minimum required mass-weighted utility improvement from a split after the complexity penalty.
 - \(S_{k1}\) and \(S_{k2}\) are proposed child candidates of \(S_k\).
 
 \[
@@ -947,16 +963,16 @@ A configured absolute \(\sigma^2_{over}\) threshold may be used instead only if 
 A practical default is:
 
 \[
-\delta_{split} = \max(\epsilon_V, \eta_{split} n_k V_k)
+\delta_{split} = \max(\epsilon_{\Delta U}, \eta_{split}|n_k U_k|)
 \]
 
-where \(\epsilon_V > 0\) is the smallest meaningful evidence-improvement margin and \(\eta_{split} > 0\) is the minimum proportional gain required before accepting a split proposal.
+where \(\epsilon_{\Delta U} > 0\) is the smallest meaningful utility-improvement margin and \(\eta_{split} > 0\) is the minimum proportional gain required before accepting a split proposal.
 
-Valid split proposals must satisfy child support requirements and the mass-weighted improvement requirement. A split that improves only one local score but fails \(\Delta V_{split} \geq \delta_{split}\) is not enough to mark a candidate overloaded.
+Valid split proposals must satisfy child support requirements and the mass-weighted utility-improvement requirement. A split that improves only one local score but fails \(\Delta U_{split} \geq \delta_{split}\) is not enough to mark a candidate overloaded.
 
 An overloaded state has thresholded evidence that the candidate contains multiple supported sub-states. It is not automatically validated statehood; it is a split-repair candidate.
 
-\(\Delta V_{split}\) is the mass-weighted split improvement defined in §22.2.
+\(\Delta U_{split}\) is the mass-weighted split improvement defined in §22.2.
 
 ### 22.1 Complexity penalty parameters
 
@@ -1031,13 +1047,13 @@ Split and merge tests use operation-specific penalty weights \(\lambda_{split}\)
 
 ### 22.2 Mass-weighted split improvement
 
-Split improvement should be mass-weighted and should pay a subtractive complexity penalty:
+Split improvement should be mass-weighted, should use uncapped utility, and should pay a subtractive complexity penalty:
 
 \[
-\Delta V_{split} = (n_{k1}V_{k1} + n_{k2}V_{k2}) - n_kV_k - \lambda_{split}\operatorname{Complexity}(k \rightarrow k1,k2)
+\Delta U_{split} = (n_{k1}U_{k1} + n_{k2}U_{k2}) - n_kU_k - \lambda_{split}\operatorname{Complexity}(k \rightarrow k1,k2)
 \]
 
-A split is favoured only if mass-weighted evidence improves after paying the complexity penalty, and each child candidate satisfies minimum support requirements:
+A split is favoured only if mass-weighted uncapped utility improves after paying the complexity penalty, and each child candidate satisfies minimum support requirements:
 
 \[
 s_{k1} \geq s_{min}
@@ -1048,6 +1064,8 @@ s_{k2} \geq s_{min}
 \]
 
 This prevents unsupported over-splitting.
+
+The clipped visibility score \(V_k\) can still be reported before and after a repair, but it is not the optimization objective.
 
 ---
 
@@ -1064,13 +1082,13 @@ S_{ij} = S_i \cup S_j
 Mass-aware merge improvement:
 
 \[
-\Delta V_{merge} = n_{ij}V_{ij} - (n_iV_i+n_jV_j) - \lambda_{merge}\operatorname{Complexity}(i,j \rightarrow ij)
+\Delta U_{merge} = n_{ij}U_{ij} - (n_iU_i+n_jU_j) - \lambda_{merge}\operatorname{Complexity}(i,j \rightarrow ij)
 \]
 
 Merge if:
 
 \[
-\Delta V_{merge} > 0
+\Delta U_{merge} > 0
 \]
 
 and:
@@ -1085,7 +1103,7 @@ Plain interpretation:
 These candidates are not meaningfully separate states.
 ```
 
-Split and merge tests both use mass-weighted evidence and subtractive complexity penalties.
+Split and merge tests both use mass-weighted uncapped utility and subtractive complexity penalties. Visibility can still be reported separately.
 
 ---
 
@@ -1158,22 +1176,27 @@ where \(\mathcal{P}\) is the repair action set:
 \mathcal{P} = \{\text{split}, \text{merge}, \text{rebound}, \text{change lens}, \text{change window}, \text{isolate transition}, \text{mark unknown}, \text{reject}\}
 \]
 
-Repair is selected by expected evidence improvement:
+Repair is selected by expected utility improvement:
 
 \[
-\rho^* = \arg\max_{\rho \in \mathcal{P}} \Delta V(\rho(S_k))
+\rho^* = \arg\max_{\rho \in \mathcal{P}} \Delta U(\rho(S_k))
 \]
 
 where:
 
 \[
-\Delta V(\rho(S_k)) = V(\rho(S_k)) - V(S_k)
+\Delta U(\rho(S_k)) = U(\rho(S_k)) - U(S_k)
 \]
 
 To avoid overfitting, add a subtractive complexity penalty:
 
 \[
-\rho^* = \arg\max_{\rho} [\Delta V(\rho(S_k)) - \lambda_{\rho}\operatorname{Complexity}(\rho)]
+\rho^*
+=
+\arg\max_{\rho}
+\left[
+\Delta U(\rho(S_k)) - \lambda_{\rho}\operatorname{Complexity}(\rho)
+\right]
 \]
 
 \(\lambda_{\rho}\) is the operation-specific repair penalty defined in the complexity penalty section.
