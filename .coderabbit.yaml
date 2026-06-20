@@ -35,21 +35,21 @@ reviews:
       mode: "warning"
 
     custom_checks:
-      - name: "Public Surface Boundary"
+      - name: "Project Scope Boundary"
         mode: "error"
         instructions: >-
-          Pass/fail criteria: Fail if public-facing files such as README.md,
+          Pass/fail criteria: Fail if user-facing files such as README.md,
           NOTICE, ATTRIBUTION.md, docs/*.md, examples/*.md, pyproject.toml, CLI
-          help, or package docstrings describe ShiftLens as derived from,
-          sanitized from, exported from, or tied to any unrelated project,
-          external repository, review archive, report set, codename, unpublished
-          implementation detail, or external provenance story. Passing PRs use
-          standalone OSS wording and describe only this ShiftLens project.
+          help, or package docstrings describe ShiftLens as copied from, derived
+          from, or tied to unrelated provenance outside this repository. Passing
+          PRs use standalone OSS wording and describe only ShiftLens, its
+          repository scope, its declared dependencies, and its documented
+          attribution policy.
 
       - name: "Diagnostics Only Framing"
         mode: "error"
         instructions: >-
-          Pass/fail criteria: Fail if docs, examples, CLI help, or public APIs
+          Pass/fail criteria: Fail if docs, examples, CLI help, or exposed APIs
           frame ShiftLens as an automated decision, execution, operational,
           signal-authority, or production-control system. Passing PRs frame
           ShiftLens as diagnostics and reproducible state evidence only.
