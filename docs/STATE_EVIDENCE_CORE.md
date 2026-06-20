@@ -846,26 +846,54 @@ Rejection is not just failure. Rejection is evidence.
 
 A dirty state is not necessarily fake.
 
-A dirty state has evidence but fails structure.
+A dirty state is repair-worthy but incoherent. It has enough support to be worth investigating, fails internal structure, and still has separation or persistence evidence strong enough to suggest real structure may be recoverable.
 
 Define dirty state condition:
 
 \[
-\text{Dirty}(S_k) = [s_k \geq s_{min} \land C_k < C_{min} \land (B_k \text{ or } P_k \text{ remains meaningful})]
+\text{Dirty}(S_k) =
+\left[
+s_k \geq s_{min}
+\land
+C_k < C_{min}
+\land
+(B_k \geq B_{dirty} \lor P_k \geq P_{dirty})
+\right]
 \]
 
-Plain interpretation:
+Where:
 
-```text
-There is probably something real here,
-but this candidate state is badly formed.
-```
+- \(B_{dirty}\) is the minimum separation evidence for dirty-state suspicion.
+- \(P_{dirty}\) is the minimum persistence evidence for dirty-state suspicion.
+- \(B_{dirty}\) and \(P_{dirty}\) are weaker repair-diagnostic thresholds, not full validation thresholds.
+
+A dirty state is not validated statehood. It is a repair candidate: enough structure exists to justify repair, but the candidate fails coherence.
 
 An overloaded state can be defined as:
 
 \[
-\text{Overloaded}(S_k) = [\sigma_k^2 \text{ high} \land \exists \text{ subregions } R_{k1}, R_{k2} \text{ with improved } C,B]
+\text{Overloaded}(S_k) =
+\left[
+\sigma_k^2 \geq \sigma^2_{over}
+\land
+\exists (S_{k1}, S_{k2}) :
+s_{k1} \geq s_{min}
+\land
+s_{k2} \geq s_{min}
+\land
+\Delta V_{split} \geq \delta_{split}
+\right]
 \]
+
+Where:
+
+- \(\sigma^2_{over}\) is the dispersion threshold for overloaded-state suspicion.
+- \(\delta_{split}\) is the minimum required mass-weighted improvement from a split after the complexity penalty.
+- \(S_{k1}\) and \(S_{k2}\) are proposed child candidates of \(S_k\).
+
+An overloaded state has thresholded evidence that the candidate contains multiple supported sub-states. It is not automatically validated statehood; it is a split-repair candidate.
+
+\(\Delta V_{split}\) is the mass-weighted split improvement defined in §22.1.
 
 ### 22.1 Mass-weighted split improvement
 
