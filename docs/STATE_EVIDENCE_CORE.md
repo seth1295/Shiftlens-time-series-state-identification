@@ -896,6 +896,8 @@ An overloaded state can be defined as:
 \[
 \text{Overloaded}(S_k) =
 \left[
+|\mathcal{D}_{over}| \geq n_{over}^{min}
+\land
 \sigma_k^2 \geq \sigma^2_{over}
 \land
 \exists (S_{k1}, S_{k2}) :
@@ -909,15 +911,34 @@ s_{k2} \geq s_{min}
 
 Where:
 
+- \(\mathcal{D}_{over}\) is the supported-candidate dispersion cohort used to set the overloaded-state threshold.
+- \(n_{over}^{min}\) is the minimum cohort size required before evaluating a cohort-relative overloaded-state threshold.
 - \(\sigma^2_{over}\) is the dispersion threshold for overloaded-state suspicion.
 - \(\delta_{split}\) is the minimum required mass-weighted improvement from a split after the complexity penalty.
 - \(S_{k1}\) and \(S_{k2}\) are proposed child candidates of \(S_k\).
 
 \[
-\sigma^2_{over} = q_{over}\left(\{\sigma_j^2 : s_j \geq s_{min}\}\right)
+n_{over}^{min} \geq 2
+\]
+
+\[
+\mathcal{D}_{over} = \{\sigma_j^2 : s_j \geq s_{min}\}
+\]
+
+\[
+\sigma^2_{over} =
+q_{over}(\mathcal{D}_{over})
+\quad
+\text{only if}
+\quad
+|\mathcal{D}_{over}| \geq n_{over}^{min}
 \]
 
 where \(q_{over}\) is a high quantile selected by the lens, such as the 0.75 or 0.90 quantile. This makes overloaded-state suspicion relative to the dispersion profile of supported candidates under the same lens.
+
+If \(|\mathcal{D}_{over}| < n_{over}^{min}\), the cohort-relative overloaded-state gate is not evaluated. In that sparse-cohort case, \(\text{Overloaded}(S_k)\) defaults to false under the cohort-relative rule. The candidate may still be reported as dirty, unstable, unknown, or requiring more evidence, but it is not labelled overloaded from an undefined cohort quantile.
+
+A configured absolute \(\sigma^2_{over}\) threshold may be used instead only if it is explicitly declared by the lens or report policy.
 
 \[
 \delta_{split} > 0
