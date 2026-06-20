@@ -50,8 +50,8 @@ reviews:
         mode: "error"
         instructions: >-
           Pass/fail criteria: Fail if docs, examples, CLI help, or exposed APIs
-          frame ShiftLens as an automated decision, execution, operational,
-          signal-authority, or production-control system. Passing PRs frame
+          frame ShiftLens as a system that makes decisions, executes actions,
+          controls operations, or authorizes domain outcomes. Passing PRs frame
           ShiftLens as diagnostics and reproducible state evidence only.
 
       - name: "Attribution Discipline"
