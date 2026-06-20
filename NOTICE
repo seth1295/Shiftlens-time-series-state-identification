@@ -1,0 +1,12 @@
+ShiftLens
+Copyright 2026 ShiftLens contributors.
+
+ShiftLens is distributed under the Apache License, Version 2.0.
+
+This release contains original ShiftLens source code, documentation, examples, and toy/synthetic datasets.
+
+Runtime and test dependencies are declared in pyproject.toml.
+
+Any future copied, adapted, or substantially derived third-party source
+material will preserve applicable license notices and attribution and will be
+documented in NOTICE or ATTRIBUTION.md as appropriate.

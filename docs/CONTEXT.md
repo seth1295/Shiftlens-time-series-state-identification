@@ -1,0 +1,7 @@
+# Context
+
+ShiftLens is a project for extracting and reporting candidate states from noisy time-series data.
+
+The first MVP uses public toy/synthetic data only. The current goal is state visibility, extraction, testing, rejection, and reproducible reporting.
+
+ShiftLens produces diagnostics and reproducible state evidence only. It does not provide decision, execution, operational, or control authority.
